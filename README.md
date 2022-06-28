@@ -8,4 +8,4 @@
 
 Ejemplos de analisis de experimentos en agricultura
 
--   split plot design
+-   split plot design (data oats)
