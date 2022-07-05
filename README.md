@@ -8,4 +8,5 @@
 
 Ejemplos de analisis de experimentos en agricultura
 
--   split plot design (data oats)
+- split plot design (data oats)
+- gam model
