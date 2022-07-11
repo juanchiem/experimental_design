@@ -19,3 +19,5 @@ knitr::opts_chunk$set(
 Ejemplos de analisis de experimentos en agricultura
 
 - split plot design (data oats)
+- gam model
+- lagged regression
