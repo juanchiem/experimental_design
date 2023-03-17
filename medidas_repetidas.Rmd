@@ -1,0 +1,98 @@
+---
+title: "Medidas repetidas"
+output: html_document
+date: "2023-03-17"
+---
+
+```{r}
+library(lme4)
+dat <- rio::import("data/rep_measures.csv")
+```
+
+```{r}
+dat
+```
+
+Random-intercept model, where you have included the cross-level interaction between Treatment and Day (the effect of Day is allowed to vary between Treatment groups)
+
+```{r}
+m1 <- lmer(Obs ~ Treatment * Day + (1 | Subject), mydata)
+plot(m1)
+```
+
+In order to allow for the change over time to differ across participants (i.e. to explicitly model individual differences in change over time), you also need to allow for the effect of Day to be random. To do this, you would specify:
+
+```{r}
+m2 <- lmer(Obs ~ Treatment * Day + (1+Day|Subject), mydata)
+```
+
+
+```{r}
+# Load necessary packages
+library(lme4)
+library(lmerTest)
+library(car)
+
+# Set up example data
+set.seed(123)
+ternero <- rep(1:20, each=10)
+time <- rep(1:10, times=20)
+trt <- rep(rep(1:2, each=5), times=2)
+corral <- rep(1:2, each=100)
+y <- rnorm(200, mean=5+trt*0.5+corral*1.5+time*0.2+ternero*0.1, sd=1)
+
+# Convert data to data frame
+dat <- data.frame(ternero=ternero, time=time, trt=trt, corral=corral, y=y)
+
+# Fit the model using lmer
+model <- lmer(y ~ trt*time + (1|ternero) + (1|corral/ternero), data=dat)
+
+# Check assumptions
+# Normality of residuals
+qqnorm(resid(model))
+qqline(resid(model))
+
+# Homogeneity of variance
+plot(model, resid(.)~fitted(.))
+
+# Sphericity of residuals
+Anova(model, type="III")
+summary(model)
+```
+
+
+```{r}
+# Load necessary packages
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(car)
+
+# Load the example dataset
+data("PlantGrowth")
+
+# Load the PlantGrowth dataset
+data(PlantGrowth)
+
+# Convert data to data frame
+one <- PlantGrowth%>% 
+  mutate(block=rep(1:10, times=3))
+two <- one %>% mutate(weight=weight + abs(1+rnorm(30)))
+dat <- bind_rows(list(one, two), .id = "time") %>% 
+head(dat)
+
+# Fit the model using lmer
+model <- lmer(weight ~ group * time + (1|block/time), data=dat)
+
+# Check assumptions
+# Normality of residuals
+qqnorm(resid(model))
+qqline(resid(model))
+
+# Homogeneity of variance
+plot(model, resid(.)~fitted(.))
+
+# Sphericity of residuals
+Anova(model, type="III")
+```
+
