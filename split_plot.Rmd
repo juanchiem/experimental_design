@@ -38,14 +38,30 @@ ggplot(aes(x = nitro, y = yield, group = gen, colour = gen)) +
 # lme4
 
 ```{r}
-pacman::p_load(lme4)
+pacman::p_load(lme4, emmeans, multcomp)
 
-fit.oats <- lmer(yield ~ gen * nitro +  # fixed 
+fit.oats <- lmer(yield ~ gen * factor(nitro) +  # fixed 
                         (1|block/gen),  # random
                         data = dat)
 car::Anova(fit.oats)
-emmeans::emmeans(fit.oats, "gen")
+plot(fit.oats)
 ```
+
+Comparar gen dentro de nitro
+```{r}
+em_oats_gen <- emmeans(fit.oats, ~ gen | nitro, type = "response")
+res_oats_gen <- cld(em_oats_gen, alpha=.05, Letters=letters)
+res_oats_gen
+```
+
+Comparar nitro dentro de gen
+
+```{r}
+em_oats_nitro <- emmeans(fit.oats, ~ nitro | gen, type = "response")
+res_oats_nitro <- cld(em_oats_nitro, alpha=.05, Letters=letters)
+res_oats_nitro
+```
+
 
 # doebioresearch
 
@@ -65,7 +81,7 @@ output
 ```{r }
 pacman::p_load(nlme)
 
-m1 <- lme(yield ~ nitro + gen, 
+m1 <- lme(yield ~ nitro * gen, 
                   random = ~1 | block/gen, # whole plot: block / sub-plot: block:gen
            data = dat)
 m1
